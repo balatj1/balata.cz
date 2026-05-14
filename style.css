@@ -155,7 +155,7 @@ strong { color: var(--ink); font-weight: 600; }
 
 .hero-title { font-size: .78rem; font-weight: 600; color: var(--accent); margin-bottom: 24px; }
 
-.hero-desc { font-size: 1rem; color: var(--muted); margin-bottom: 36px; max-width: 480px; }
+.hero-desc { font-size: 1rem; color: var(--muted); margin-bottom: 36px; max-width: 560px; }
 
 .hero-cta { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 48px; }
 
@@ -166,7 +166,7 @@ strong { color: var(--ink); font-weight: 600; }
 .stat-number { font-size: 2.2rem; color: var(--ink); }
 .stat-label { font-size: .68rem; font-weight: 500; color: var(--muted); }
 
-.hero-photo { display: block; width: 260px; height: auto; }
+.hero-photo { display: block; width: 200px; height: auto; }
 
 /* ─── Research ─────────────────────────────────── */
 .research { padding: 56px 0; background: var(--surf); border-bottom: 1px solid var(--rule); }
