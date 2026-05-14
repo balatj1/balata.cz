@@ -95,6 +95,16 @@ strong { color: var(--ink); font-weight: 600; }
   margin-left: 0;
 }
 
+/* ─── Section intro ────────────────────────────── */
+.section-intro {
+  font-family: var(--ss);
+  font-size: .9rem;
+  color: var(--muted);
+  line-height: 1.7;
+  max-width: 640px;
+  margin-bottom: 32px;
+}
+
 /* ─── Buttons ──────────────────────────────────── */
 .btn {
   display: inline-flex;
@@ -337,6 +347,83 @@ strong { color: var(--ink); font-weight: 600; }
 .pub-footer { margin-top: 8px; }
 .scholar-link { display: inline-flex; align-items: center; gap: 6px; font-family: var(--ss); font-size: .78rem; font-weight: 500; color: var(--accent); transition: opacity .15s; }
 .scholar-link:hover { opacity: .7; }
+
+/* ─── Impact ───────────────────────────────────── */
+.impact { padding: 56px 0; background: var(--white); border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); }
+
+.impact-intro {
+  font-family: var(--ss);
+  font-size: .9rem;
+  color: var(--muted);
+  line-height: 1.7;
+  max-width: 720px;
+  margin-bottom: 40px;
+}
+
+.impact-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+}
+
+.impact-card {
+  background: var(--surf);
+  padding: 24px;
+  transition: background .15s;
+}
+.impact-card:hover { background: var(--white); }
+
+.impact-card h3 {
+  font-family: var(--ss);
+  font-size: .72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  color: var(--ink);
+  margin-bottom: 10px;
+}
+
+.impact-card > p {
+  font-family: var(--ss);
+  font-size: .82rem;
+  color: var(--muted);
+  line-height: 1.6;
+  margin-bottom: 16px;
+}
+
+.impact-card ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.impact-card li {
+  font-family: var(--ss);
+  font-size: .82rem;
+  color: var(--muted);
+  line-height: 1.6;
+  padding-left: 16px;
+  position: relative;
+}
+
+.impact-card li::before {
+  content: '—';
+  position: absolute;
+  left: 0;
+  color: var(--abg);
+  font-weight: 600;
+}
+
+@media (max-width: 900px) {
+  .impact-grid { grid-template-columns: 1fr 1fr; }
+}
+
+@media (max-width: 600px) {
+  .impact-grid { grid-template-columns: 1fr; }
+}
 
 /* ─── Services ─────────────────────────────────── */
 .services { padding: 64px 0; }
