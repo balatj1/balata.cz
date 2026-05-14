@@ -437,34 +437,6 @@
 
   <script>
 
-    /* ── Counting numbers ── */
-    function animateCount(el) {
-      const raw = el.textContent.trim();
-      const suffix = raw.replace(/[0-9]/g, '');
-      const target = parseInt(raw, 10);
-      if (isNaN(target)) return;
-      const duration = 900;
-      const startTime = performance.now();
-      (function tick(now) {
-        const t = Math.min((now - startTime) / duration, 1);
-        const eased = 1 - Math.pow(1 - t, 3);
-        el.textContent = Math.round(eased * target) + suffix;
-        if (t < 1) requestAnimationFrame(tick);
-      })(performance.now());
-    }
-
-    const countObserver = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          animateCount(entry.target);
-          countObserver.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.3 });
-
-    document.querySelectorAll('.stat-number, .pub-metric-num, .pub-citations-num')
-      .forEach(el => countObserver.observe(el));
-
     /* ── Contact form ── */
     const form = document.getElementById('contactForm');
     const status = document.getElementById('formStatus');
