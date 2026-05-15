@@ -77,10 +77,11 @@
   }
   </script>
 
+  <link rel="preload" as="image" href="jan-balata.avif" fetchpriority="high" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;1,8..60,300;1,8..60,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link rel="preload" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;1,8..60,300;1,8..60,400&family=Inter:wght@400;500;600&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'" />
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;1,8..60,300;1,8..60,400&family=Inter:wght@400;500;600&display=swap" /></noscript>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -142,7 +143,10 @@
         </div>
       </div>
       <div class="hero-photo-wrap">
-        <img src="1637691779647.webp" alt="Jan Balata" class="hero-photo" />
+        <picture>
+          <source srcset="jan-balata.avif" type="image/avif" />
+          <img src="1637691779647.webp" alt="Jan Balata" class="hero-photo" width="256" height="256" fetchpriority="high" />
+        </picture>
       </div>
     </div>
   </section>
@@ -195,22 +199,22 @@
       </div>
       <div class="about-highlights">
         <div class="highlight-card">
-          <div class="highlight-icon"><i class="fa-solid fa-graduation-cap"></i></div>
+          <div class="highlight-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" fill="currentColor" aria-hidden="true"><path d="M320 32c-8.1 0-16.1 1.4-23.7 4.1L15.8 137.4C6.3 140.9 0 149.9 0 160s6.3 19.1 15.8 22.6l57.9 20.9C57.3 229.3 48 259.8 48 291.9l0 28.1c0 28.4-10.8 57.7-22.3 80.8c-6.5 13-13.9 25.8-22.5 37.6C0 442.7-.9 448.3 .9 453.4s6 8.9 11.2 10.2l64 16c4.2 1.1 8.7 .3 12.4-2s6.3-6.1 7.1-10.4c8.6-42.8 4.3-81.2-2.1-108.7C90.3 344.3 86 329.8 80 316.5l0-24.6c0-30.2 10.2-58.7 27.9-81.5c12.9-15.5 29.6-28 49.2-35.7l157-61.7c8.2-3.2 17.5 .8 20.7 9s-.8 17.5-9 20.7l-157 61.7c-12.4 4.9-23.3 12.4-32.2 21.6l159.6 57.6c7.6 2.7 15.6 4.1 23.7 4.1s16.1-1.4 23.7-4.1L624.2 182.6c9.5-3.4 15.8-12.5 15.8-22.6s-6.3-19.1-15.8-22.6L343.7 36.1C336.1 33.4 328.1 32 320 32zM128 408c0 35.3 86 72 192 72s192-36.7 192-72L496.7 262.6 354.5 314c-11.1 4-22.8 6-34.5 6s-23.5-2-34.5-6L143.3 262.6 128 408z"/></svg></div>
           <h3>Ph.D. in HCI</h3>
           <p>Czech Technical University, Faculty of Electrical Engineering (2011–2018)</p>
         </div>
         <div class="highlight-card">
-          <div class="highlight-icon"><i class="fa-solid fa-compass"></i></div>
+          <div class="highlight-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="currentColor" aria-hidden="true"><path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zm50.7-186.9L162.4 380.6c-19.4 7.5-38.5-11.6-31-31l55.5-144.3c3.3-8.5 9.9-15.1 18.4-18.4l144.3-55.5c19.4-7.5 38.5 11.6 31 31L325.1 306.7c-3.2 8.5-9.9 15.1-18.4 18.4zM288 256a32 32 0 1 0 -64 0 32 32 0 1 0 64 0z"/></svg></div>
           <h3>Co-founder, Naviterier</h3>
           <p>Navigation system for the blind describing routes the way a human would</p>
         </div>
         <div class="highlight-card">
-          <div class="highlight-icon"><i class="fa-solid fa-chalkboard-user"></i></div>
+          <div class="highlight-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" fill="currentColor" aria-hidden="true"><path d="M160 64c0-35.3 28.7-64 64-64L576 0c35.3 0 64 28.7 64 64l0 288c0 35.3-28.7 64-64 64l-239.2 0c-11.8-25.5-29.9-47.5-52.4-64l99.6 0 0-32c0-17.7 14.3-32 32-32l64 0c17.7 0 32 14.3 32 32l0 32 64 0 0-288L224 64l0 49.1C205.2 102.2 183.3 96 160 96l0-32zm0 64a96 96 0 1 1 0 192 96 96 0 1 1 0-192zM133.3 352l53.3 0C260.3 352 320 411.7 320 485.3c0 14.7-11.9 26.7-26.7 26.7L26.7 512C11.9 512 0 500.1 0 485.3C0 411.7 59.7 352 133.3 352z"/></svg></div>
           <h3>Lecturer &amp; Mentor</h3>
           <p>Prague University of Economics and Business — teaching and supervising thesis projects</p>
         </div>
         <div class="highlight-card">
-          <div class="highlight-icon"><i class="fa-solid fa-location-dot"></i></div>
+          <div class="highlight-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" fill="currentColor" aria-hidden="true"><path d="M215.7 499.2C267 435 384 279.4 384 192C384 86 298 0 192 0S0 86 0 192c0 87.4 117 243 168.3 307.2c12.3 15.3 35.1 15.3 47.4 0zM192 128a64 64 0 1 1 0 128 64 64 0 1 1 0-128z"/></svg></div>
           <h3>Research in Czech Republic</h3>
           <p>On-site qualitative studies in Prague with local recruitment contacts</p>
         </div>
@@ -234,7 +238,7 @@
             <span class="process-num">01</span>
             <span class="process-name">Brief</span>
             <span class="process-subtitle">Questions, scope &amp; deadlines</span>
-            <span class="process-icon"><i class="fa-solid fa-plus"></i></span>
+            <span class="process-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" fill="currentColor" aria-hidden="true"><path d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 144L48 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l144 0 0 144c0 17.7 14.3 32 32 32s32-14.3 32-32l0-144 144 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-144 0 0-144z"/></svg></span>
           </button>
           <div class="process-body"><div class="process-body-inner">
             <p>The product manager and designer send a research request — typically in Notion or Jira. It defines the research questions, target groups or personas, what is already known, what the team will do with the outcomes, and deadlines. A clear brief prevents wasted effort on both sides.</p>
@@ -246,7 +250,7 @@
             <span class="process-num">02</span>
             <span class="process-name">Research plan</span>
             <span class="process-subtitle">Kick-off, methods &amp; timeline</span>
-            <span class="process-icon"><i class="fa-solid fa-plus"></i></span>
+            <span class="process-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" fill="currentColor" aria-hidden="true"><path d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 144L48 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l144 0 0 144c0 17.7 14.3 32 32 32s32-14.3 32-32l0-144 144 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-144 0 0-144z"/></svg></span>
           </button>
           <div class="process-body"><div class="process-body-inner">
             <p>Based on the brief and a kick-off meeting, I put together a research plan: refined research questions, chosen methods, and a schedule. For this type of project I often propose a co-design workshop — it grounds abstract discussions in tangible design artefacts and lets participants clearly assign priorities to each need and its design manifestation.</p>
@@ -258,7 +262,7 @@
             <span class="process-num">03</span>
             <span class="process-name">Recruiting</span>
             <span class="process-subtitle">Sample, segmentation &amp; channels</span>
-            <span class="process-icon"><i class="fa-solid fa-plus"></i></span>
+            <span class="process-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" fill="currentColor" aria-hidden="true"><path d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 144L48 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l144 0 0 144c0 17.7 14.3 32 32 32s32-14.3 32-32l0-144 144 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-144 0 0-144z"/></svg></span>
           </button>
           <div class="process-body"><div class="process-body-inner">
             <p>I define sample size, segmentation, and recruiting strategy — then operationalise it. This means deciding how many users and non-users to include, which persona to target, and which channel to use: invitations via email or social, outreach through CSM or professional services consultants, or platforms like Calendly, Respondent, and UserInterviews.</p>
@@ -270,7 +274,7 @@
             <span class="process-num">04</span>
             <span class="process-name">Session guide</span>
             <span class="process-subtitle">Agenda, consent &amp; materials</span>
-            <span class="process-icon"><i class="fa-solid fa-plus"></i></span>
+            <span class="process-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" fill="currentColor" aria-hidden="true"><path d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 144L48 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l144 0 0 144c0 17.7 14.3 32 32 32s32-14.3 32-32l0-144 144 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-144 0 0-144z"/></svg></span>
           </button>
           <div class="process-body"><div class="process-body-inner">
             <p>Before fieldwork starts I prepare the session agenda: consent form, privacy notice, signed NDA, list of topics, interview questions, and supporting materials — templates for notes, Miro boards for co-design activities. I collaborate on the guide with product managers and designers so they are fully engaged in the research and can make the most of the insights.</p>
@@ -282,7 +286,7 @@
             <span class="process-num">05</span>
             <span class="process-name">Sessions</span>
             <span class="process-subtitle">Interviews, workshops &amp; observation</span>
-            <span class="process-icon"><i class="fa-solid fa-plus"></i></span>
+            <span class="process-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" fill="currentColor" aria-hidden="true"><path d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 144L48 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l144 0 0 144c0 17.7 14.3 32 32 32s32-14.3 32-32l0-144 144 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-144 0 0-144z"/></svg></span>
           </button>
           <div class="process-body"><div class="process-body-inner">
             <p>I meet participants, facilitate the conversation or co-design workshop, and navigate the interview to cover all topics while staying on track. Dot voting reveals how participants prioritise features — equivalent to money spent on development. Product managers and designers are invited to observe and ask follow-up questions at specific moments; developers sometimes join as well.</p>
@@ -294,7 +298,7 @@
             <span class="process-num">06</span>
             <span class="process-name">Analysis</span>
             <span class="process-subtitle">Transcription, coding &amp; affinity mapping</span>
-            <span class="process-icon"><i class="fa-solid fa-plus"></i></span>
+            <span class="process-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" fill="currentColor" aria-hidden="true"><path d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 144L48 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l144 0 0 144c0 17.7 14.3 32 32 32s32-14.3 32-32l0-144 144 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-144 0 0-144z"/></svg></span>
           </button>
           <div class="process-body"><div class="process-body-inner">
             <p>The majority of the work happens after the sessions. I transcribe all recordings (using tools like Condens), collect all notes, and run thematic analysis and affinity mapping to uncover new topics and connected themes in the data. This is a collaborative activity — PMs and designers contribute alongside me.</p>
@@ -306,7 +310,7 @@
             <span class="process-num">07</span>
             <span class="process-name">Synthesis</span>
             <span class="process-subtitle">Insights, report &amp; delivery formats</span>
-            <span class="process-icon"><i class="fa-solid fa-plus"></i></span>
+            <span class="process-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" fill="currentColor" aria-hidden="true"><path d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 144L48 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l144 0 0 144c0 17.7 14.3 32 32 32s32-14.3 32-32l0-144 144 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-144 0 0-144z"/></svg></span>
           </button>
           <div class="process-body"><div class="process-body-inner">
             <p>The final stage of processing all collected data: writing insights, assembling the research report, and preparing supporting materials — a Slack post summary or a short video walkthrough — so the findings reach people in the format that suits them.</p>
@@ -318,7 +322,7 @@
             <span class="process-num">08</span>
             <span class="process-name">Broadcasting</span>
             <span class="process-subtitle">Stakeholder presentation &amp; repository</span>
-            <span class="process-icon"><i class="fa-solid fa-plus"></i></span>
+            <span class="process-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" fill="currentColor" aria-hidden="true"><path d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 144L48 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l144 0 0 144c0 17.7 14.3 32 32 32s32-14.3 32-32l0-144 144 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-144 0 0-144z"/></svg></span>
           </button>
           <div class="process-body"><div class="process-body-inner">
             <p>I present the report to key stakeholders from the product vertical: product managers, designers, front-end and back-end developers. The goal is to ensure alignment and action on top of what we learned. The report is added to a Reports &amp; Insights repository for secondary analysis, and shared in a dedicated Slack channel.</p>
@@ -330,7 +334,7 @@
             <span class="process-num">09</span>
             <span class="process-name">Prioritisation workshop</span>
             <span class="process-subtitle">Value × Effort matrix &amp; alignment</span>
-            <span class="process-icon"><i class="fa-solid fa-plus"></i></span>
+            <span class="process-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" fill="currentColor" aria-hidden="true"><path d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 144L48 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l144 0 0 144c0 17.7 14.3 32 32 32s32-14.3 32-32l0-144 144 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-144 0 0-144z"/></svg></span>
           </button>
           <div class="process-body"><div class="process-body-inner">
             <p>Using a Value × Effort matrix from Design Thinking, the PM, developer lead, and designer sort out and prioritise ideas together. Dot voting and participant effort estimates ensure the data from research arrives with clear priority attached — and that design, research, product, and engineering are collaborating from the start.</p>
@@ -339,7 +343,7 @@
 
       </div>
       <p class="process-ai-note">
-        <i class="fa-solid fa-wand-magic-sparkles"></i>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" fill="currentColor" aria-hidden="true"><path d="M234.7 42.7L197 56.8c-3 1.1-5 4-5 7.2s2 6.1 5 7.2l37.7 14.1L248.8 123c1.1 3 4 5 7.2 5s6.1-2 7.2-5l14.1-37.7L315 71.2c3-1.1 5-4 5-7.2s-2-6.1-5-7.2L277.3 42.7 263.2 5c-1.1-3-4-5-7.2-5s-6.1 2-7.2 5L234.7 42.7zM46.1 395.4c-18.7 18.7-18.7 49.1 0 67.9l34.6 34.6c18.7 18.7 49.1 18.7 67.9 0L529.9 116.5c18.7-18.7 18.7-49.1 0-67.9L495.3 14.1c-18.7-18.7-49.1-18.7-67.9 0L46.1 395.4zM484.6 82.6l-105 105-23.3-23.3 105-105 23.3 23.3zM7.5 117.2C3 118.9 0 123.2 0 128s3 9.1 7.5 10.8L64 160l21.2 56.5c1.7 4.5 6 7.5 10.8 7.5s9.1-3 10.8-7.5L128 160l56.5-21.2c4.5-1.7 7.5-6 7.5-10.8s-3-9.1-7.5-10.8L128 96 106.8 39.5C105.1 35 100.8 32 96 32s-9.1 3-10.8 7.5L64 96 7.5 117.2zm352 256c-4.5 1.7-7.5 6-7.5 10.8s3 9.1 7.5 10.8L416 416l21.2 56.5c1.7 4.5 6 7.5 10.8 7.5s9.1-3 10.8-7.5L480 416l56.5-21.2c4.5-1.7 7.5-6 7.5-10.8s-3-9.1-7.5-10.8L480 352l-21.2-56.5c-1.7-4.5-6-7.5-10.8-7.5s-9.1 3-10.8 7.5L416 352l-56.5 21.2z"/></svg>
         AI is woven through the entire process — from drafting research plans and interview guides to transcription, thematic analysis, and report writing.
       </p>
     </div>
@@ -377,7 +381,7 @@
             <p class="pub-title">KoalaPhone: touchscreen mobile phone UI for active older adults</p>
             <p class="pub-meta">J Balata, Z Mikovec, T Slavicek · Journal on Multimodal User Interfaces 9(4), 263–273 · 2015</p>
           </div>
-          <div class="pub-arrow"><i class="fa-solid fa-arrow-up-right-from-square"></i></div>
+          <div class="pub-arrow"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="currentColor" aria-hidden="true"><path d="M320 0c-17.7 0-32 14.3-32 32s14.3 32 32 32l82.7 0L201.4 265.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L448 109.3l0 82.7c0 17.7 14.3 32 32 32s32-14.3 32-32l0-160c0-17.7-14.3-32-32-32L320 0zM80 32C35.8 32 0 67.8 0 112L0 432c0 44.2 35.8 80 80 80l320 0c44.2 0 80-35.8 80-80l0-112c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 112c0 8.8-7.2 16-16 16L80 448c-8.8 0-16-7.2-16-16l0-320c0-8.8 7.2-16 16-16l112 0c17.7 0 32-14.3 32-32s-14.3-32-32-32L80 32z"/></svg></div>
         </a>
 
         <a class="pub-item" href="https://scholar.google.com/scholar?q=BlindCamera+Central+golden-ratio+composition+blind+photographers" target="_blank" rel="noopener">
@@ -390,7 +394,7 @@
             <p class="pub-title">BlindCamera: Central and golden-ratio composition for blind photographers</p>
             <p class="pub-meta">J Balata, Z Mikovec, L Neoproud · Multimedia, Interaction, Design and Innovation · 2015</p>
           </div>
-          <div class="pub-arrow"><i class="fa-solid fa-arrow-up-right-from-square"></i></div>
+          <div class="pub-arrow"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="currentColor" aria-hidden="true"><path d="M320 0c-17.7 0-32 14.3-32 32s14.3 32 32 32l82.7 0L201.4 265.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L448 109.3l0 82.7c0 17.7 14.3 32 32 32s32-14.3 32-32l0-160c0-17.7-14.3-32-32-32L320 0zM80 32C35.8 32 0 67.8 0 112L0 432c0 44.2 35.8 80 80 80l320 0c44.2 0 80-35.8 80-80l0-112c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 112c0 8.8-7.2 16-16 16L80 448c-8.8 0-16-7.2-16-16l0-320c0-8.8 7.2-16 16-16l112 0c17.7 0 32-14.3 32-32s-14.3-32-32-32L80 32z"/></svg></div>
         </a>
 
         <a class="pub-item" href="https://scholar.google.com/scholar?q=Collaborative+navigation+visually+impaired+Balata+Mikovec" target="_blank" rel="noopener">
@@ -403,7 +407,7 @@
             <p class="pub-title">Collaborative navigation of visually impaired</p>
             <p class="pub-meta">J Balata, J Franc, Z Mikovec, P Slavik · Journal on Multimodal User Interfaces 8(2), 175–185 · 2014</p>
           </div>
-          <div class="pub-arrow"><i class="fa-solid fa-arrow-up-right-from-square"></i></div>
+          <div class="pub-arrow"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="currentColor" aria-hidden="true"><path d="M320 0c-17.7 0-32 14.3-32 32s14.3 32 32 32l82.7 0L201.4 265.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L448 109.3l0 82.7c0 17.7 14.3 32 32 32s32-14.3 32-32l0-160c0-17.7-14.3-32-32-32L320 0zM80 32C35.8 32 0 67.8 0 112L0 432c0 44.2 35.8 80 80 80l320 0c44.2 0 80-35.8 80-80l0-112c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 112c0 8.8-7.2 16-16 16L80 448c-8.8 0-16-7.2-16-16l0-320c0-8.8 7.2-16 16-16l112 0c17.7 0 32-14.3 32-32s-14.3-32-32-32L80 32z"/></svg></div>
         </a>
 
         <a class="pub-item" href="https://scholar.google.com/scholar?q=Landmark-enhanced+route+itineraries+navigation+blind+pedestrians+urban" target="_blank" rel="noopener">
@@ -416,7 +420,7 @@
             <p class="pub-title">Landmark-enhanced route itineraries for navigation of blind pedestrians in urban environment</p>
             <p class="pub-meta">J Balata, Z Mikovec, P Slavik · Journal on Multimodal User Interfaces 12(3), 181–198 · 2018</p>
           </div>
-          <div class="pub-arrow"><i class="fa-solid fa-arrow-up-right-from-square"></i></div>
+          <div class="pub-arrow"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="currentColor" aria-hidden="true"><path d="M320 0c-17.7 0-32 14.3-32 32s14.3 32 32 32l82.7 0L201.4 265.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L448 109.3l0 82.7c0 17.7 14.3 32 32 32s32-14.3 32-32l0-160c0-17.7-14.3-32-32-32L320 0zM80 32C35.8 32 0 67.8 0 112L0 432c0 44.2 35.8 80 80 80l320 0c44.2 0 80-35.8 80-80l0-112c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 112c0 8.8-7.2 16-16 16L80 448c-8.8 0-16-7.2-16-16l0-320c0-8.8 7.2-16 16-16l112 0c17.7 0 32-14.3 32-32s-14.3-32-32-32L80 32z"/></svg></div>
         </a>
 
         <a class="pub-item" href="https://scholar.google.com/scholar?q=Automatically+generated+landmark-enhanced+navigation+instructions+blind+pedestrians" target="_blank" rel="noopener">
@@ -429,7 +433,7 @@
             <p class="pub-title">Automatically generated landmark-enhanced navigation instructions for blind pedestrians</p>
             <p class="pub-meta">J Balata, Z Mikovec, P Bures, E Mulickova · Federated Conference on Computer Science and Information Systems · 2016</p>
           </div>
-          <div class="pub-arrow"><i class="fa-solid fa-arrow-up-right-from-square"></i></div>
+          <div class="pub-arrow"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="currentColor" aria-hidden="true"><path d="M320 0c-17.7 0-32 14.3-32 32s14.3 32 32 32l82.7 0L201.4 265.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L448 109.3l0 82.7c0 17.7 14.3 32 32 32s32-14.3 32-32l0-160c0-17.7-14.3-32-32-32L320 0zM80 32C35.8 32 0 67.8 0 112L0 432c0 44.2 35.8 80 80 80l320 0c44.2 0 80-35.8 80-80l0-112c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 112c0 8.8-7.2 16-16 16L80 448c-8.8 0-16-7.2-16-16l0-320c0-8.8 7.2-16 16-16l112 0c17.7 0 32-14.3 32-32s-14.3-32-32-32L80 32z"/></svg></div>
         </a>
 
         <a class="pub-item" href="https://scholar.google.com/scholar?q=Misalignment+semantic+user+model+elicitation+conversational+agents+Berka+Balata" target="_blank" rel="noopener">
@@ -442,7 +446,7 @@
             <p class="pub-title">Misalignment in semantic user model elicitation via conversational agents</p>
             <p class="pub-meta">J Berka, J Balata, CM Jonker, Z Mikovec et al. · International Journal of Human–Computer Interaction 38(18–20) · 2022</p>
           </div>
-          <div class="pub-arrow"><i class="fa-solid fa-arrow-up-right-from-square"></i></div>
+          <div class="pub-arrow"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="currentColor" aria-hidden="true"><path d="M320 0c-17.7 0-32 14.3-32 32s14.3 32 32 32l82.7 0L201.4 265.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L448 109.3l0 82.7c0 17.7 14.3 32 32 32s32-14.3 32-32l0-160c0-17.7-14.3-32-32-32L320 0zM80 32C35.8 32 0 67.8 0 112L0 432c0 44.2 35.8 80 80 80l320 0c44.2 0 80-35.8 80-80l0-112c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 112c0 8.8-7.2 16-16 16L80 448c-8.8 0-16-7.2-16-16l0-320c0-8.8 7.2-16 16-16l112 0c17.7 0 32-14.3 32-32s-14.3-32-32-32L80 32z"/></svg></div>
         </a>
 
       </div>
@@ -518,7 +522,7 @@
       <div class="services-grid">
 
         <div class="service-card">
-          <div class="service-icon"><i class="fa-solid fa-magnifying-glass"></i></div>
+          <div class="service-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="currentColor" aria-hidden="true"><path d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z"/></svg></div>
           <h3>UX Research</h3>
           <p>
             Qualitative research — user interviews, usability testing, and
@@ -531,7 +535,7 @@
         </div>
 
         <div class="service-card">
-          <div class="service-icon"><i class="fa-solid fa-seedling"></i></div>
+          <div class="service-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="currentColor" aria-hidden="true"><path d="M512 32c0 113.6-84.6 207.5-194.2 222c-7.1-53.4-30.6-101.6-65.3-139.3C290.8 46.3 364 0 448 0l32 0c17.7 0 32 14.3 32 32zM0 96C0 78.3 14.3 64 32 64l32 0c123.7 0 224 100.3 224 224l0 32 0 160c0 17.7-14.3 32-32 32s-32-14.3-32-32l0-160C100.3 320 0 219.7 0 96z"/></svg></div>
           <h3>Mentoring</h3>
           <p>
             Planning to conduct user research on your own but looking for expert
@@ -541,7 +545,7 @@
         </div>
 
         <div class="service-card">
-          <div class="service-icon"><i class="fa-solid fa-gears"></i></div>
+          <div class="service-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" fill="currentColor" aria-hidden="true"><path d="M308.5 135.3c7.1-6.3 9.9-16.2 6.2-25c-2.3-5.3-4.8-10.5-7.6-15.5L304 89.4c-3-5-6.3-9.9-9.8-14.6c-5.7-7.6-15.7-10.1-24.7-7.1l-28.2 9.3c-10.7-8.8-23-16-36.2-20.9L199 27.1c-1.9-9.3-9.1-16.7-18.5-17.8C173.9 8.4 167.2 8 160.4 8l-.7 0c-6.8 0-13.5 .4-20.1 1.2c-9.4 1.1-16.6 8.6-18.5 17.8L115 56.1c-13.3 5-25.5 12.1-36.2 20.9L50.5 67.8c-9-3-19-.5-24.7 7.1c-3.5 4.7-6.8 9.6-9.9 14.6l-3 5.3c-2.8 5-5.3 10.2-7.6 15.6c-3.7 8.7-.9 18.6 6.2 25l22.2 19.8C32.6 161.9 32 168.9 32 176s.6 14.1 1.7 20.9L11.5 216.7c-7.1 6.3-9.9 16.2-6.2 25c2.3 5.3 4.8 10.5 7.6 15.6l3 5.2c3 5.1 6.3 9.9 9.9 14.6c5.7 7.6 15.7 10.1 24.7 7.1l28.2-9.3c10.7 8.8 23 16 36.2 20.9l6.1 29.1c1.9 9.3 9.1 16.7 18.5 17.8c6.7 .8 13.5 1.2 20.4 1.2s13.7-.4 20.4-1.2c9.4-1.1 16.6-8.6 18.5-17.8l6.1-29.1c13.3-5 25.5-12.1 36.2-20.9l28.2 9.3c9 3 19 .5 24.7-7.1c3.5-4.7 6.8-9.5 9.8-14.6l3.1-5.4c2.8-5 5.3-10.2 7.6-15.5c3.7-8.7 .9-18.6-6.2-25l-22.2-19.8c1.1-6.8 1.7-13.8 1.7-20.9s-.6-14.1-1.7-20.9l22.2-19.8zM112 176a48 48 0 1 1 96 0 48 48 0 1 1 -96 0zM504.7 500.5c6.3 7.1 16.2 9.9 25 6.2c5.3-2.3 10.5-4.8 15.5-7.6l5.4-3.1c5-3 9.9-6.3 14.6-9.8c7.6-5.7 10.1-15.7 7.1-24.7l-9.3-28.2c8.8-10.7 16-23 20.9-36.2l29.1-6.1c9.3-1.9 16.7-9.1 17.8-18.5c.8-6.7 1.2-13.5 1.2-20.4s-.4-13.7-1.2-20.4c-1.1-9.4-8.6-16.6-17.8-18.5L583.9 307c-5-13.3-12.1-25.5-20.9-36.2l9.3-28.2c3-9 .5-19-7.1-24.7c-4.7-3.5-9.6-6.8-14.6-9.9l-5.3-3c-5-2.8-10.2-5.3-15.6-7.6c-8.7-3.7-18.6-.9-25 6.2l-19.8 22.2c-6.8-1.1-13.8-1.7-20.9-1.7s-14.1 .6-20.9 1.7l-19.8-22.2c-6.3-7.1-16.2-9.9-25-6.2c-5.3 2.3-10.5 4.8-15.6 7.6l-5.2 3c-5.1 3-9.9 6.3-14.6 9.9c-7.6 5.7-10.1 15.7-7.1 24.7l9.3 28.2c-8.8 10.7-16 23-20.9 36.2L315.1 313c-9.3 1.9-16.7 9.1-17.8 18.5c-.8 6.7-1.2 13.5-1.2 20.4s.4 13.7 1.2 20.4c1.1 9.4 8.6 16.6 17.8 18.5l29.1 6.1c5 13.3 12.1 25.5 20.9 36.2l-9.3 28.2c-3 9-.5 19 7.1 24.7c4.7 3.5 9.5 6.8 14.6 9.8l5.4 3.1c5 2.8 10.2 5.3 15.5 7.6c8.7 3.7 18.6 .9 25-6.2l19.8-22.2c6.8 1.1 13.8 1.7 20.9 1.7s14.1-.6 20.9-1.7l19.8 22.2zM464 304a48 48 0 1 1 0 96 48 48 0 1 1 0-96z"/></svg></div>
           <h3>Operations</h3>
           <p>
             I have experience both leading my own UX research team and
@@ -552,7 +556,7 @@
         </div>
 
         <div class="service-card">
-          <div class="service-icon"><i class="fa-solid fa-book-open"></i></div>
+          <div class="service-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" fill="currentColor" aria-hidden="true"><path d="M249.6 471.5c10.8 3.8 22.4-4.1 22.4-15.5l0-377.4c0-4.2-1.6-8.4-5-11C247.4 52 202.4 32 144 32C93.5 32 46.3 45.3 18.1 56.1C6.8 60.5 0 71.7 0 83.8L0 454.1c0 11.9 12.8 20.2 24.1 16.5C55.6 460.1 105.5 448 144 448c33.9 0 79 14 105.6 23.5zm76.8 0C353 462 398.1 448 432 448c38.5 0 88.4 12.1 119.9 22.6c11.3 3.8 24.1-4.6 24.1-16.5l0-370.3c0-12.1-6.8-23.3-18.1-27.6C529.7 45.3 482.5 32 432 32c-58.4 0-103.4 20-123 35.6c-3.3 2.6-5 6.8-5 11L304 456c0 11.4 11.7 19.3 22.4 15.5z"/></svg></div>
           <h3>Training</h3>
           <p>
             Looking for a UX course for your product team — in-person or

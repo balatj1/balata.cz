@@ -212,6 +212,7 @@ strong { color: var(--ink); font-weight: 600; }
 .highlight-card { background: var(--white); padding: 24px; transition: background .15s; }
 .highlight-card:hover { background: var(--surf); }
 .highlight-icon { font-size: 1rem; margin-bottom: 12px; color: var(--accent); }
+.highlight-icon svg, .service-icon svg, .process-icon svg, .pub-arrow svg, .process-ai-note svg { display: inline-block; height: 1em; width: auto; overflow: visible; vertical-align: -0.125em; }
 .highlight-card h3 { font-size: .72rem; font-weight: 600; color: var(--ink); margin-bottom: 6px; }
 .highlight-card p { font-family: var(--ss); font-size: .82rem; color: var(--muted); line-height: 1.55; }
 
