@@ -656,6 +656,11 @@
     </div>
   </footer>
 
+  <div class="mouse-edge" id="meTop"       aria-hidden="true"></div>
+  <div class="mouse-edge" id="meLeft"      aria-hidden="true"></div>
+  <div class="mouse-edge-label" id="meTopLabel"  aria-hidden="true"></div>
+  <div class="mouse-edge-label" id="meLeftLabel" aria-hidden="true"></div>
+
   <script>
 
     document.getElementById('copy-year').textContent = new Date().getFullYear();
@@ -713,6 +718,51 @@
       });
       toggleAllBtn.textContent = allOpen ? 'Expand all' : 'Collapse all';
     });
+
+    /* ── Mouse coord lines ── */
+    (function () {
+      if (window.matchMedia('(pointer: coarse)').matches) return;
+
+      let mousePos = { x: 0, y: 0 };
+      let visible = false;
+
+      const meTop       = document.getElementById('meTop');
+      const meLeft      = document.getElementById('meLeft');
+      const meTopLabel  = document.getElementById('meTopLabel');
+      const meLeftLabel = document.getElementById('meLeftLabel');
+      const edges       = [meTop, meLeft, meTopLabel, meLeftLabel];
+
+      function positionEdges() {
+        meTop.style.left  = mousePos.x + 'px';
+        meTop.style.top   = '0';
+
+        meLeft.style.top  = mousePos.y + 'px';
+        meLeft.style.left = '0';
+
+        meTopLabel.textContent = mousePos.x + ' px';
+        meTopLabel.style.left  = (mousePos.x + 5) + 'px';
+        meTopLabel.style.top   = '3px';
+
+        meLeftLabel.textContent = mousePos.y + ' px';
+        meLeftLabel.style.left  = '3px';
+        meLeftLabel.style.top   = (mousePos.y + 5) + 'px';
+      }
+
+      document.addEventListener('mousemove', (e) => {
+        mousePos.x = e.clientX;
+        mousePos.y = e.clientY;
+        if (!visible) {
+          visible = true;
+          edges.forEach(el => el.classList.add('is-visible'));
+        }
+        positionEdges();
+      });
+
+      document.documentElement.addEventListener('mouseleave', () => {
+        edges.forEach(el => el.classList.remove('is-visible'));
+        visible = false;
+      });
+    })();
 
     /* ── Contact form ── */
     const form = document.getElementById('contactForm');
