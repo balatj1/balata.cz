@@ -315,6 +315,28 @@ strong { color: var(--ink); font-weight: 600; }
 .chart-wrap { overflow-x: auto; }
 .chart { min-width: 600px; position: relative; }
 
+.timeline-list { display: none; border-top: 1px solid var(--rule); }
+.timeline-list-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--ruled);
+}
+.timeline-list-org {
+  font-family: var(--sb);
+  font-size: .9rem;
+  color: var(--ink);
+}
+.timeline-list-dates {
+  font-family: var(--ss);
+  font-size: .72rem;
+  color: var(--muted);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
 .axis-row {
   position: relative;
   height: 20px;
@@ -730,4 +752,6 @@ strong { color: var(--ink); font-weight: 600; }
   .footer-inner { flex-direction: column; align-items: flex-start; }
   .pub-metrics { flex-wrap: wrap; gap: 16px; }
   .pub-metric + .pub-metric { border-left: none; padding-left: 0; }
+  .chart-wrap { display: none; }
+  .timeline-list { display: flex; flex-direction: column; }
 }

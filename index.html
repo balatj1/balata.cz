@@ -250,6 +250,7 @@
       <div class="timeline">
         <p class="section-eyebrow">Timeline</p>
         <div class="chart-wrap"><div class="chart" id="timeline-chart"></div></div>
+        <div class="timeline-list" id="timeline-list"></div>
       </div>
     </div>
   </section>
@@ -850,6 +851,23 @@
 
       document.fonts.ready.then(layout);
       window.addEventListener('resize', layout);
+
+      const list = document.getElementById('timeline-list');
+      if (list) {
+        [...companies].reverse().forEach(c => {
+          const item = document.createElement('div');
+          item.className = 'timeline-list-item';
+          const org = document.createElement('span');
+          org.className = 'timeline-list-org';
+          org.textContent = c.org;
+          const dates = document.createElement('span');
+          dates.className = 'timeline-list-dates';
+          dates.textContent = formatDate(c.s) + ' – ' + (c.present ? 'present' : formatDate(c.e));
+          item.appendChild(org);
+          item.appendChild(dates);
+          list.appendChild(item);
+        });
+      }
     })();
 
     /* ── Mouse coord lines ── */
