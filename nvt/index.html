@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Naviterier je navigace pro nevidomé a slabozraké chodce. Popíše cestu lidsky, krok za krokem, s popisem okolí, přechodů a povrchů. Webová aplikace pro iOS i Android, zdarma.">
+<meta name="theme-color" content="#293780">
+<title>Naviterier — navigace pro nevidomé a slabozraké chodce</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;1,14..32,400;1,14..32,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+
+<style>
+  /* ---------- Design tokens — logo palette ---------- */
+  /* Logo colors: #FDE25E yellow (icon bg), #5B68AF mid-blue (main mark), #293780 navy (subtext) */
+  :root {
+    /* — Brand colors — */
+    --brand: #5b68af;          /* mid-blue — 5.19:1 on white (AA) */
+    --brand-ink: #293780;      /* navy — 10.76:1 on white (AAA) */
+    --accent: #fde25e;         /* yellow — dekorativní; nikdy jako text na světlém bg */
+
+    /* — Ink — */
+    --ink: #16131f;            /* ~18:1 on white */
+    --ink-soft: #3d3d5c;       /* ~8:1 on white */
+
+    /* — Surfaces — */
+    --bg: #ffffff;
+    --bg-tint: #eef0f8;        /* světle modrý pruh; navy = 9.45:1 */
+    --surface: #ffffff;
+    --border: #c5c9e0;
+
+    /* — Interactive — */
+    --focus: #293780;
+    --btn-bg: #293780;         /* white on navy = 10.76:1 (AAA) */
+    --btn-text: #ffffff;
+    --btn-bg-hover: #1a2660;
+
+    /* — Elevation — */
+    --shadow-sm: 0 1px 2px rgba(22,19,31,.05);
+    --shadow: 0 1px 3px rgba(22,19,31,.06), 0 6px 20px rgba(41,55,128,.08);
+    --shadow-lg: 0 2px 4px rgba(22,19,31,.07), 0 12px 32px rgba(41,55,128,.12);
+
+    /* — Shape — */
+    --radius-sm: 8px;
+    --radius: 14px;
+    --radius-lg: 20px;
+
+    /* — Spacing scale (4px base) — */
+    --space-1: 0.25rem;   /*  4px */
+    --space-2: 0.5rem;    /*  8px */
+    --space-3: 0.75rem;   /* 12px */
+    --space-4: 1rem;      /* 16px */
+    --space-5: 1.25rem;   /* 20px */
+    --space-6: 1.5rem;    /* 24px */
+    --space-8: 2rem;      /* 32px */
+    --space-10: 2.5rem;   /* 40px */
+    --space-12: 3rem;     /* 48px */
+
+    /* — Type — */
+    --text-sm: 0.875rem;
+    --text-base: 1.125rem;
+    --text-lg: 1.25rem;
+    --text-xl: 1.5rem;
+    --measure: 62ch;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --brand: #8a95cc;
+      --brand-ink: #b0b9e8;
+      --accent: #fde25e;
+      --ink: #edf0fb;
+      --ink-soft: #b0b9e8;
+      --bg: #0f1226;
+      --bg-tint: #181d3a;
+      --surface: #1b2040;
+      --border: #2e3566;
+      --focus: #b0b9e8;
+      --btn-bg: #5b68af;
+      --btn-text: #ffffff;
+      --btn-bg-hover: #7280c8;
+      --shadow-sm: 0 1px 2px rgba(0,0,0,.35);
+      --shadow: 0 1px 3px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.45);
+      --shadow-lg: 0 2px 6px rgba(0,0,0,.5), 0 16px 40px rgba(0,0,0,.55);
+    }
+  }
+
+  /* ---------- Reset & base ---------- */
+  *, *::before, *::after { box-sizing: border-box; }
+  html { scroll-behavior: smooth; scroll-padding-top: 5.5rem; -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    font-size: 1.125rem;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1, h2, h3 { line-height: 1.15; letter-spacing: -0.01em; margin: 0 0 .5em; }
+  h1 { font-size: clamp(2.2rem, 6vw, 3.4rem); }
+  h2 { font-size: clamp(1.7rem, 4vw, 2.3rem); }
+  h3 { font-size: 1.3rem; }
+  p { margin: 0 0 1rem; }
+  a { color: var(--brand-ink); }
+  a:hover { color: var(--ink); }
+  img, svg { max-width: 100%; }
+  ul, ol { margin: 0; padding: 0; }
+
+  /* ---------- Focus & utilities ---------- */
+  :focus-visible {
+    outline: 3px solid var(--focus);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+  .sr-only {
+    position: absolute; width: 1px; height: 1px;
+    padding: 0; margin: -1px; overflow: hidden;
+    clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+  }
+  .skip-link {
+    position: absolute; left: var(--space-4); top: -100px;
+    z-index: 100;
+    background: var(--surface); color: var(--brand-ink);
+    border: 2px solid var(--brand-ink); border-radius: var(--radius-sm);
+    padding: var(--space-3) var(--space-5); font-weight: 700; text-decoration: none;
+    transition: top .15s ease;
+  }
+  .skip-link:focus { top: var(--space-4); }
+
+  .container { width: min(72rem, 100% - var(--space-8)); margin-inline: auto; }
+  .section { padding-block: clamp(var(--space-10), 8vw, 5rem); }
+  .section--tint { background: var(--bg-tint); }
+  .section__head { max-width: var(--measure); margin-bottom: var(--space-8); }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: var(--space-3);
+    font-size: var(--text-sm); font-weight: 700;
+    letter-spacing: .14em; text-transform: uppercase;
+    color: var(--brand-ink); margin-bottom: var(--space-3);
+  }
+  .badge-free {
+    display: inline-block; font-size: .75rem; letter-spacing: .08em;
+    background: var(--accent); color: #1a1a1a;   /* 14:1 (AAA) — always dark on yellow */
+    border-radius: 999px; padding: .15em .65em; vertical-align: middle;
+  }
+  .lead { font-size: var(--text-lg); color: var(--ink-soft); max-width: var(--measure); }
+  .prose { max-width: var(--measure); }
+  .prose p { color: var(--ink-soft); }
+
+  /* ---------- Buttons ---------- */
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2);
+    min-height: 2.5rem; padding: var(--space-2) var(--space-6);
+    font: inherit; font-size: var(--text-base); font-weight: 700; text-decoration: none;
+    border-radius: 999px; border: 2px solid transparent; cursor: pointer;
+    transition: background-color .15s ease, color .15s ease, border-color .15s ease, transform .15s ease;
+  }
+  .btn--primary { background: var(--btn-bg); color: var(--btn-text); }
+  .btn--primary:hover { background: var(--btn-bg-hover); color: var(--btn-text); }
+  .btn--ghost { background: transparent; color: var(--brand-ink); border-color: currentColor; }
+  .btn--ghost:hover { background: var(--bg-tint); color: var(--brand-ink); }
+  .btn:active { transform: translateY(1px); }
+  .btn:disabled { opacity: .5; cursor: not-allowed; }
+  .badge-soon {
+    display: inline-block; font-size: .65rem; font-weight: 700; letter-spacing: .06em;
+    background: rgba(255,255,255,.25); color: inherit;
+    border-radius: 999px; padding: .1em .5em; vertical-align: middle; line-height: 1.4;
+  }
+
+  /* ---------- Header ---------- */
+  .site-header {
+    position: sticky; top: 0; z-index: 50;
+    background: color-mix(in srgb, var(--bg) 88%, transparent);
+    backdrop-filter: saturate(140%) blur(8px);
+    border-bottom: 1px solid var(--border);
+  }
+  .header-inner { display: flex; align-items: center; gap: var(--space-4); min-height: 4.25rem; }
+  .brand { display: inline-flex; align-items: center; gap: var(--space-3); text-decoration: none; flex: none; }
+  .brand:hover { opacity: .88; }
+  .brand__icon { width: 2.4rem; height: 2.4rem; flex: none; border-radius: 6px; overflow: visible; }
+  .brand__wordmark { height: 1.6rem; width: auto; display: none; }
+  .header-spacer { flex: 1 1 auto; }
+  .header-cta { display: none; }
+
+  .primary-nav-wrap { display: contents; }
+  .primary-nav { position: relative; }
+  .primary-nav__toggle {
+    display: inline-flex; align-items: center; gap: var(--space-2);
+    min-height: 3rem; padding: var(--space-2) var(--space-4);
+    font: inherit; font-weight: 700; color: var(--ink);
+    background: transparent; border: 2px solid var(--border); border-radius: 999px;
+    cursor: pointer; list-style: none;
+  }
+  .primary-nav__toggle::-webkit-details-marker { display: none; }
+  .primary-nav__chevron { width: 1rem; height: 1rem; transition: transform .15s ease; }
+  .primary-nav[open] .primary-nav__chevron { transform: rotate(180deg); }
+  .primary-nav__list {
+    display: none;
+    position: absolute; right: 0; top: calc(100% + var(--space-2));
+    min-width: 16rem; list-style: none;
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+    box-shadow: var(--shadow-lg); padding: var(--space-2);
+  }
+  .primary-nav[open] .primary-nav__list { display: block; }
+  .primary-nav__list a {
+    display: block; padding: var(--space-3) var(--space-4); border-radius: var(--radius-sm);
+    text-decoration: none; color: var(--ink); font-weight: 700;
+  }
+  .primary-nav__list a:hover { background: var(--bg-tint); color: var(--brand-ink); }
+
+  /* ---------- Hero ---------- */
+  .hero { padding-block: clamp(var(--space-10), 7vw, 5rem); position: relative; overflow: hidden; }
+  #hero-map {
+    position: absolute; inset: 0; z-index: 0;
+    opacity: .50; pointer-events: none;
+  }
+  .hero__grid { display: grid; gap: clamp(var(--space-8), 5vw, var(--space-12)); align-items: center; position: relative; z-index: 1; }
+  .hero__title { margin-bottom: var(--space-3); }
+  .hero__lead { font-size: var(--text-lg); color: var(--ink-soft); max-width: 40ch; }
+  .hero__actions { display: flex; flex-wrap: wrap; gap: var(--space-3); margin-top: var(--space-6); }
+  .hero__meta { margin-top: var(--space-5); color: var(--ink-soft); font-size: var(--text-sm); }
+  .hero__meta span { white-space: nowrap; }
+  .hero__meta .sep { color: var(--brand); padding: 0 var(--space-2); font-weight: 700; }
+
+  /* Spoken-route transcript — the signature element */
+  .route {
+    background: var(--surface);
+    border: 1px solid var(--border); border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: var(--space-6);
+  }
+  .route__label {
+    font-size: var(--text-sm); font-weight: 700; letter-spacing: .12em; text-transform: uppercase;
+    color: var(--brand-ink); margin-bottom: var(--space-5);
+    display: flex; align-items: center; gap: var(--space-2);
+  }
+  .route__list { list-style: none; }
+  .route__step { position: relative; padding: 0 0 var(--space-5) var(--space-8); }
+  .route__step:last-child { padding-bottom: 0; }
+  .route__step::before {
+    content: ""; position: absolute; left: 3px; top: .5rem;
+    width: 14px; height: 14px; border-radius: 50%;
+    background: var(--surface); border: 3px solid var(--brand);
+    z-index: 1;
+  }
+  /* Line segment from center of this dot to center of next dot */
+  .route__step:not(:last-child)::after {
+    content: ""; position: absolute;
+    left: 9px; width: 2px; background: var(--border);
+    top: calc(.5rem + 7px);
+    bottom: calc(-.5rem - 7px);
+  }
+  .route__step--end::before { background: var(--brand); border-color: var(--brand); }
+  .route__tag {
+    display: inline-block; font-size: .8rem; font-weight: 700;
+    letter-spacing: .06em; text-transform: uppercase; color: var(--brand-ink);
+    margin-bottom: var(--space-1);
+  }
+  .route__text { margin: 0; color: var(--ink); }
+
+  /* ---------- Capability cards ---------- */
+  .grid { display: grid; gap: var(--space-4); grid-template-columns: 1fr; }
+  /* <ul class="grid"> — reset inherited list bullets on both ul and li */
+  ul.grid { list-style: none; padding: 0; margin: 0; }
+  ul.grid > li { list-style: none; }
+  .card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: var(--space-5);
+  }
+  .card__icon { width: 2rem; height: 2rem; color: var(--brand); margin-bottom: var(--space-4); }
+  .card h3 { margin-bottom: var(--space-2); }
+  .card p { margin: 0; color: var(--ink-soft); }
+
+  /* ---------- Steps (ordered process) ---------- */
+  .steps { list-style: none; counter-reset: step; display: grid; gap: var(--space-5); max-width: var(--measure); padding: 0; margin: 0; }
+  .steps > li {
+    counter-increment: step;
+    display: grid;
+    grid-template-columns: 2.5rem 1fr;
+    gap: 0 var(--space-4);
+    align-items: start;
+  }
+  /* Yellow number badge — column 1, spans 1 row; text block spans remaining rows */
+  .steps > li::before {
+    content: counter(step);
+    grid-column: 1; grid-row: 1 / 3;
+    width: 2.5rem; height: 2.5rem; border-radius: 50%;
+    background: var(--accent); color: var(--ink);  /* 14:1 (AAA) */
+    display: grid; place-items: center;
+    font-weight: 700; font-size: 1.1rem;
+    align-self: start; margin-top: .1rem;          /* optical alignment with h3 */
+    flex: none;
+  }
+  .steps h3 { grid-column: 2; margin: 0 0 var(--space-1); }
+  .steps p  { grid-column: 2; margin: 0; color: var(--ink-soft); }
+
+  .callout {
+    margin-top: var(--space-8); max-width: var(--measure);
+    border-left: 4px solid var(--brand);
+    padding-left: var(--space-4);
+  }
+  .callout p { margin: 0; font-style: italic; color: var(--ink-soft); }
+
+  /* ---------- Coverage tiers ---------- */
+  .tiers { display: grid; gap: var(--space-5); grid-template-columns: 1fr; }
+  .tier { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--space-5); }
+  .tier__rank { font-size: var(--text-sm); font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--brand-ink); }
+  .tier h3 { margin: var(--space-1) 0 var(--space-2); }
+  .tier p { margin: 0; color: var(--ink-soft); }
+
+  /* ---------- Pricing ---------- */
+  .price-grid { display: grid; gap: var(--space-8); grid-template-columns: 1fr; align-items: start; }
+  .price-card {
+    background: var(--surface); border: 2px solid var(--brand);
+    border-radius: var(--radius); padding: var(--space-6); box-shadow: var(--shadow);
+  }
+  .price-card__amount { font-size: clamp(2.4rem, 7vw, 3.4rem); font-weight: 700; line-height: 1; color: var(--ink); }
+  .price-card__label { color: var(--ink-soft); margin-top: var(--space-2); }
+  .price-card__note { color: var(--ink-soft); margin: var(--space-4) 0 var(--space-5); }
+  .checklist { list-style: none; display: grid; gap: var(--space-3); padding: 0; }
+  .checklist li { position: relative; padding-left: var(--space-8); color: var(--ink); }
+  .checklist li::before {
+    content: ""; position: absolute; left: 0; top: .35rem;
+    width: 1.25rem; height: 1.25rem;
+    background: var(--brand);
+    -webkit-mask: var(--check) center / contain no-repeat;
+    mask: var(--check) center / contain no-repeat;
+  }
+
+  /* ---------- FAQ ---------- */
+  .faq { max-width: var(--measure); display: grid; gap: var(--space-3); }
+  .faq__item { border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); overflow: hidden; }
+  .faq__q {
+    list-style: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: space-between; gap: var(--space-4);
+    padding: var(--space-4) var(--space-5); font-weight: 700; font-size: 1.05rem; color: var(--ink);
+  }
+  .faq__q::-webkit-details-marker { display: none; }
+  .faq__icon { width: 1.3rem; height: 1.3rem; color: var(--brand); flex: none; transition: transform .15s ease; }
+  .faq__item[open] .faq__icon { transform: rotate(45deg); }
+  .faq__a { color: var(--ink-soft); }
+
+  /* ---------- Team / research ---------- */
+  .split { display: grid; gap: clamp(var(--space-8), 5vw, var(--space-12)); grid-template-columns: 1fr; }
+  .people { list-style: none; display: grid; gap: var(--space-2); padding: 0; }
+  .people li { font-weight: 400; color: var(--ink); }
+  .quote { font-style: italic; color: var(--ink-soft); border-left: 4px solid var(--brand); padding-left: var(--space-4); margin-top: var(--space-4); }
+
+  /* ---------- Footer ---------- */
+  .site-footer { background: var(--bg-tint); border-top: 1px solid var(--border); padding-block: clamp(var(--space-10), 6vw, 4rem); }
+  .footer-grid { display: grid; gap: var(--space-8); grid-template-columns: 1fr; }
+  .footer-grid h2 { font-size: var(--text-xl); }
+  .contact-list { list-style: none; display: grid; gap: var(--space-2); color: var(--ink-soft); padding: 0; }
+  .contact-list strong { color: var(--ink); }
+  .footer-email { font-size: var(--text-lg); font-weight: 700; }
+  .legal { margin-top: var(--space-8); padding-top: var(--space-6); border-top: 1px solid var(--border); color: var(--ink-soft); font-size: var(--text-sm); }
+
+  /* ---------- Responsive ---------- */
+  @media (min-width: 48rem) {
+    .header-cta { display: inline-flex; }
+    .brand__wordmark { display: block; }   /* show full wordmark on desktop */
+    .primary-nav__toggle { display: none; }
+    .primary-nav__list {
+      display: flex !important; position: static; min-width: 0;
+      box-shadow: none; border: 0; background: transparent; padding: 0; gap: .25rem;
+    }
+    .primary-nav__list a { padding: .5rem .8rem; }
+    .grid { grid-template-columns: repeat(2, 1fr); }
+    .tiers { grid-template-columns: repeat(2, 1fr); }
+    .hero__grid { grid-template-columns: 1.05fr .95fr; }
+    .price-grid { grid-template-columns: .9fr 1.1fr; }
+    .split { grid-template-columns: 1fr 1fr; }
+    .footer-grid { grid-template-columns: 1.2fr 1fr; }
+  }
+  @media (min-width: 64rem) {
+    .grid { grid-template-columns: repeat(3, 1fr); }
+  }
+
+  /* ---------- Hero entrance ---------- */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(18px); }
+    to   { opacity: 1; transform: none; }
+  }
+  .hero .eyebrow       { animation: fadeUp .5s ease both; }
+  .hero__title         { animation: fadeUp .55s .07s ease both; }
+  .hero__lead          { animation: fadeUp .55s .14s ease both; }
+  .hero__actions       { animation: fadeUp .55s .22s ease both; }
+  .hero__meta          { animation: fadeUp .55s .30s ease both; }
+  .hero .route         { animation: fadeUp .6s  .18s ease both; }
+
+  /* ---------- Scroll reveal ---------- */
+  .reveal {
+    opacity: 0; transform: translateY(16px);
+    transition: opacity .5s ease, transform .5s ease;
+  }
+  .reveal.is-visible { opacity: 1; transform: none; }
+
+  .reveal-stagger > * {
+    opacity: 0; transform: translateY(12px);
+    transition: opacity .45s ease, transform .45s ease;
+  }
+  .reveal-stagger.is-visible > *:nth-child(1) { transition-delay: .00s; }
+  .reveal-stagger.is-visible > *:nth-child(2) { transition-delay: .08s; }
+  .reveal-stagger.is-visible > *:nth-child(3) { transition-delay: .16s; }
+  .reveal-stagger.is-visible > *:nth-child(4) { transition-delay: .24s; }
+  .reveal-stagger.is-visible > *:nth-child(5) { transition-delay: .32s; }
+  .reveal-stagger.is-visible > *:nth-child(6) { transition-delay: .40s; }
+  .reveal-stagger.is-visible > *:nth-child(7) { transition-delay: .48s; }
+  .reveal-stagger.is-visible > * { opacity: 1; transform: none; }
+  .grid.reveal-stagger.is-visible > * { transition-delay: 0s; }
+
+  /* ---------- Card hover ---------- */
+  .card {
+    transition: transform .2s ease, box-shadow .2s ease;
+  }
+  .card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow);
+  }
+  .tier {
+    transition: transform .2s ease, box-shadow .2s ease;
+  }
+  .tier:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow);
+  }
+
+  /* ---------- Button primary hover lift ---------- */
+  .btn--primary:not(:disabled):hover { transform: translateY(-1px); }
+  .btn--primary:not(:disabled):active { transform: translateY(1px); }
+
+  /* ---------- FAQ smooth expand ---------- */
+  .faq__a {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows .28s ease;
+    padding-bottom: 0;
+    overflow: hidden;
+  }
+  .faq__item[open] .faq__a { grid-template-rows: 1fr; }
+  .faq__a > p { overflow: hidden; padding: 0 var(--space-5) var(--space-5); margin: 0; color: var(--ink-soft); }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; }
+    .reveal, .reveal-stagger > * { opacity: 1; transform: none; }
+  }
+</style>
+</head>
+
+<body id="top">
+  <a class="skip-link" href="#main">Přeskočit na hlavní obsah</a>
+
+  <!-- defs: shared check mask for the pricing list -->
+  <svg width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute">
+    <defs>
+      <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5" fill="none" stroke="black" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    </defs>
+  </svg>
+  <style> :root { --check: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5" fill="none" stroke="black" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>'); } </style>
+
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="#top" aria-label="Naviterier – domovská stránka">
+        <!-- Logo icon: yellow square with the "n" wave mark -->
+        <svg class="brand__icon" viewBox="0 0 111.21 111.13" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <rect x="1.5" y="1.46" width="108.21" height="108.21" rx="22.79" ry="22.79" fill="#fde25e"/>
+          <path d="M85.81,45c1.3-7.3-2-14-7-14.88s-10,4.33-11.3,11.63h0c-2.86,13.77,5.95,25.07.1,25-6.36-.07-16.76-35.93-26.49-35.93-7.58,0-9.42,13.57-11.63,21.52C28,57.86,26,64.43,25.45,68h0c-1.3,7.3,2,14,7,14.88s10-4.33,11.3-11.63h0c1.15-7.52-5.09-15.09.72-15.17C50.78,56,62.22,80,70.72,80.15c9.2,0.15,11.34-15.51,12.82-23,0.89-4.49,1.33-6.3,2.26-12.15h0Z" fill="#5b68af"/>
+          <ellipse cx="30.21" cy="91.82" rx="5.53" ry="4.2" transform="translate(-66.23 98.35) rotate(-75.66)" fill="#5b68af"/>
+          <ellipse cx="40.35" cy="90.33" rx="3.41" ry="4.48" transform="translate(-6.13 3) rotate(-3.95)" fill="#5b68af"/>
+          <ellipse cx="21.97" cy="85.07" rx="4.48" ry="3.41" transform="translate(-61.51 57.69) rotate(-57.36)" fill="#5b68af"/>
+          <ellipse cx="80.47" cy="20.73" rx="5.53" ry="4.2" transform="translate(47.4 96.96) rotate(-81)" fill="#5b68af"/>
+          <ellipse cx="70.51" cy="23.26" rx="3.41" ry="4.48" transform="translate(-2.83 11.68) rotate(-9.28)" fill="#5b68af"/>
+          <ellipse cx="89.3" cy="26.58" rx="4.48" ry="3.41" transform="translate(24.72 93.74) rotate(-62.7)" fill="#5b68af"/>
+        </svg>
+        <!-- Wordmark: shown on desktop, hidden on mobile (icon only) -->
+        <svg class="brand__wordmark" viewBox="111 0 332 75" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <path d="M187.73,54.94c-2.48,12.42-9.12,17.73-16.57,17.73-6.58,0-11.66-4.1-12.6-10.81a17.38,17.38,0,0,1,.22-6l5.62-25.92a6.36,6.36,0,0,0,.08-2.35,4.11,4.11,0,0,0-4.32-3.49,7.59,7.59,0,0,0-7.14,6V30l-8.11,37.8c-1.07,8.12-12.5,5.17-11-1.61l10.48-49.15c0.75-4.23,9-3.09,9.4.94a10.62,10.62,0,0,1,8.34-2.75c6.46,0.61,12.23,4.36,13.17,11.08a13.83,13.83,0,0,1-.22,5.1V31.38L169,59.51a5,5,0,0,0-.06,1.95,3,3,0,0,0,2.94,2.75c3.42,0,6.09-4.43,7.51-11C180.25,48.5,188.74,50.11,187.73,54.94Z" fill="#5b68af"/>
+          <path d="M222.41,56.55c-0.34,1.41-.58,2.08-0.94,3.29-3.27,9.67-9.23,12.69-14.8,12.69-2.08,0-7.26-.6-9.76-4a11.54,11.54,0,0,1-8.12,3.42A12.11,12.11,0,0,1,177,61.79a10.91,10.91,0,0,1,.16-3.62l3.81-17.79c1.23-5.1,5.58-7.59,10-7.59a16,16,0,0,1,8,2.08c2.66-4,11.11-2.21,9.78,4.57l-4.5,21.49a7.55,7.55,0,0,0-.06,1.95,1.87,1.87,0,0,0,2,1.68c3,0,6-3,7.93-10C215.18,48.63,224.12,50.11,222.41,56.55Zm-27.55.34L196.31,50c1.3-6.51-2-7.25-2.11-7.32s-3.13-1.28-4.41,4.43l-2,10.41c-0.28,1.34-.42,4.16,1.87,4.7C190.94,62.46,193.54,61.86,194.86,56.89Z" fill="#5b68af"/>
+          <path d="M257.69,54.4c-1.11,6.92-5.39,11.28-11.91,11.28a12.32,12.32,0,0,1-8.88-3.49l-2.06,3c-3.72,5.1-5.62,7.32-10.39,7.32-5.24,0-9.58-3.62-10.42-9.6a15.93,15.93,0,0,1-.09-3.49l1.83-21.82c0.4-6.24,10.89-6.18,10.13,2.35l-2.08,21.48a7,7,0,0,0,0,1.95c0.29,2.08,3-1.75,4.06-3.62l2.91-5.57c-4-7.12-.07-20.07,6.68-20.81,6.93-.81,9.29,5.44,6.46,12.08-1.16,2.75-1.82,4.23-3,7.05a5.89,5.89,0,0,0-.08,1.81,3.63,3.63,0,0,0,3.81,3.22c2.48,0,3.91-1.81,4.61-5C250.26,47.83,258.43,49.64,257.69,54.4Z" fill="#5b68af"/>
+          <path d="M257.17,61.19a3.09,3.09,0,0,0-.06,1.07A2.77,2.77,0,0,0,260,64.54c2.68,0,5.86-2.75,7.79-11.48,1.17-5,9.42-3.22,8.48,1.54-2.75,13.9-9.44,17.93-16,17.93-6.17,0-11.92-3.62-12.8-9.94a17,17,0,0,1,.2-4.3c1.28-6.25,3-14.24,4.24-20.55,1.51-7.39,11-5.37,9.73,2.35Z" fill="#5b68af"/>
+          <path d="M297.95,55.14c-2.28,11-8.57,17.39-17.16,17.39-6.91,0-13.59-4-14.55-10.88a13.62,13.62,0,0,1,.17-4.5v0.07c1.21-5.77,2.09-9.53,3.29-15.31h-2.21c-4,0-5.69-8,1.09-8h2.82l3.11-14.17c1.2-6.78,10.77-3.63,9.82,1.54l-2.65,12.62h3c5.7,0,5.69,8-.43,8h-4.36L276,59.78a3.63,3.63,0,0,0-.06,1.48c0.26,1.81,1.93,3.22,4.35,3.22,3.9,0,7.64-3.49,9.28-10.88C290.88,48.36,299,50.38,297.95,55.14Z" fill="#5b68af"/>
+          <path d="M328.68,55.14C326.05,68,316.11,72.67,306.77,72.67c-9.8,0-18-5.1-19.16-13.09a14.54,14.54,0,0,1,.2-4.77l2.35-11.48c1.41-6.71,6.76-10.2,12.73-10.2,7.59,0,13.31,4.9,14.21,11.28a14.45,14.45,0,0,1,0,3.69c-1,6-5.8,9.87-11.91,9.87a14.87,14.87,0,0,1-7.33-2l-0.36,1.28a4.64,4.64,0,0,0-.07,1.88c0.43,3.09,3.87,5.57,8.77,5.57A14.2,14.2,0,0,0,320.34,53.6C321.09,48.9,329.74,49.77,328.68,55.14ZM300.31,44.33l-0.84,4c2.74,1.34,7.31,1.34,7.87-2.21a4.31,4.31,0,0,0,0-1.61,3.76,3.76,0,0,0-3.57-3.42C302.27,41.11,300.83,42.32,300.31,44.33Z" fill="#5b68af"/>
+          <path d="M360.58,54.67c-2.37,11.35-8.1,17.86-15.41,17.86a11.47,11.47,0,0,1-11.57-9.67,12.44,12.44,0,0,1,.21-4.3l1.8-8.19c0.54-3.29-2.49-3.89-4.81-4.57l-2.34,10.07c-0.92,4.9-9.21,4.16-8.28-1.61l3-13.23a9,9,0,0,1-2.35-4.77,7.44,7.44,0,0,1,.22-3.22,4.84,4.84,0,0,1,5.06-4.1c3.56,0,7.3,3.69,6.54,7.39,3.92,1.14,12.36,3.83,13.25,10.21a12.29,12.29,0,0,1-.15,3.69l-2.41,11a4.17,4.17,0,0,0-.06,1.48A1.79,1.79,0,0,0,345,64.48c2.82,0,5.56-4.84,7.19-11.41C352.95,48.16,361.5,50.24,360.58,54.67Z" fill="#5b68af"/>
+          <path d="M359.33,61.19a3.15,3.15,0,0,0-.05,1.07,2.77,2.77,0,0,0,2.87,2.28c2.68,0,5.86-2.75,7.79-11.48,1.17-5,9.41-3.22,8.47,1.54-2.75,13.9-9.43,17.93-16,17.93-6.18,0-11.92-3.62-12.81-9.94a16.89,16.89,0,0,1,.2-4.3c1.27-6.25,3-14.24,4.23-20.55,1.52-7.39,11-5.37,9.73,2.35Z" fill="#5b68af"/>
+          <path d="M409,55.14C406.4,68,396.46,72.67,387.12,72.67c-9.81,0-18-5.1-19.16-13.09a14.39,14.39,0,0,1,.2-4.77l2.35-11.48c1.4-6.71,6.75-10.2,12.73-10.2,7.59,0,13.31,4.9,14.21,11.28a14.34,14.34,0,0,1,0,3.69c-1,6-5.79,9.87-11.91,9.87a14.87,14.87,0,0,1-7.33-2l-0.36,1.28a4.6,4.6,0,0,0-.07,1.88c0.44,3.09,3.87,5.57,8.77,5.57A14.2,14.2,0,0,0,400.69,53.6C401.44,48.9,410.09,49.77,409,55.14ZM380.66,44.33l-0.85,4c2.74,1.34,7.31,1.34,7.88-2.21a4.37,4.37,0,0,0,0-1.61,3.76,3.76,0,0,0-3.57-3.42C382.62,41.11,381.18,42.32,380.66,44.33Z" fill="#5b68af"/>
+          <path d="M440.93,54.67c-2.37,11.35-8.1,17.86-15.42,17.86A11.47,11.47,0,0,1,414,62.86a12.36,12.36,0,0,1,.2-4.3l1.8-8.19c0.55-3.29-2.5-3.89-4.8-4.57l-2.34,10.07c-0.92,4.9-9.21,4.16-8.28-1.61l3-13.23a9,9,0,0,1-2.35-4.77,7.47,7.47,0,0,1,.22-3.22A4.83,4.83,0,0,1,406.5,29c3.56,0,7.3,3.69,6.54,7.39,3.92,1.14,12.36,3.83,13.25,10.21a12.38,12.38,0,0,1-.15,3.69l-2.41,11a4.18,4.18,0,0,0-.06,1.48,1.8,1.8,0,0,0,1.66,1.75c2.82,0,5.57-4.84,7.19-11.41C433.3,48.16,441.85,50.24,440.93,54.67Z" fill="#5b68af"/>
+          <path d="M366.91,23.81c1.27-3.37.06-7.17-2.68-8.49s-6,.34-7.26,3.71-0.07,7.17,2.68,8.49S365.64,27.18,366.91,23.81Z" fill="#5b68af"/>
+          <path d="M265.55,23.81c1.27-3.37.06-7.17-2.68-8.49s-6,.34-7.26,3.71-0.07,7.17,2.68,8.49S264.29,27.18,265.55,23.81Z" fill="#5b68af"/>
+        </svg>
+      </a>
+
+      <span class="header-spacer"></span>
+
+      <nav class="primary-nav-wrap" aria-label="Hlavní">
+        <details class="primary-nav">
+          <summary class="primary-nav__toggle">
+            Menu
+            <svg class="primary-nav__chevron" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m6 9 6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </summary>
+          <ul class="primary-nav__list">
+            <li><a href="#co-umi">Co umí</a></li>
+            <li><a href="#jak-to-funguje">Jak to funguje</a></li>
+            <li><a href="#pokryti">Pokrytí</a></li>
+            <li><a href="#cena">Cena</a></li>
+            <li><a href="#caste-dotazy">Časté dotazy</a></li>
+            <li><a href="#kontakt">Kontakt</a></li>
+          </ul>
+        </details>
+      </nav>
+
+      <button class="btn btn--primary header-cta" disabled>Otevřít aplikaci <span class="badge-soon">Již brzy</span></button>
+    </div>
+  </header>
+
+  <main id="main" tabindex="-1">
+
+    <!-- HERO -->
+    <section class="hero" aria-labelledby="hero-title">
+      <div id="hero-map" aria-hidden="true"></div>
+      <div class="container">
+      <div class="hero__grid">
+        <div>
+          <p class="eyebrow">Navigace pro nevidomé chodce <span class="badge-free" aria-label="Zdarma">Zdarma</span></p>
+          <h1 class="hero__title" id="hero-title">Naviguje vás slovy, ne mapou.</h1>
+          <p class="hero__lead">Naviterier je navigace pro nevidomé a slabozraké chodce. Cestu vám popíše tak, jak by ji popsal člověk — krok za krokem, s okolím, přechody i povrchem chodníku.</p>
+          <div class="hero__actions">
+            <button class="btn btn--primary" disabled>Otevřít aplikaci <span class="badge-soon">Již brzy</span></button>
+            <a class="btn btn--ghost" href="#jak-to-funguje">Jak to funguje</a>
+          </div>
+          <p class="hero__meta">
+            <span>Webová aplikace pro iOS&nbsp;i&nbsp;Android</span><span class="sep" aria-hidden="true">·</span><span>Zdarma</span><span class="sep" aria-hidden="true">·</span><span>Funguje v&nbsp;celé&nbsp;ČR</span>
+          </p>
+        </div>
+
+        <div class="route" role="group" aria-label="Ukázka, jak Naviterier popisuje trasu">
+          <p class="route__label">
+            <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 22s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="11" r="2" fill="currentColor"/></svg>
+            Ukázka trasy
+          </p>
+          <ol class="route__list">
+            <li class="route__step">
+              <span class="route__tag">Start</span>
+              <p class="route__text">Stojíte před vchodem. Vyjděte na chodník a dejte se doleva.</p>
+            </li>
+            <li class="route__step">
+              <span class="route__tag">Okolí</span>
+              <p class="route__text">Po pravé ruce máte zeď domu, po levé zábradlí. Chodník mírně klesá.</p>
+            </li>
+            <li class="route__step">
+              <span class="route__tag">Přechod</span>
+              <p class="route__text">Za 30 metrů dojdete ke světelnému přechodu přes dvouproudou silnici.</p>
+            </li>
+            <li class="route__step">
+              <span class="route__tag">Povrch</span>
+              <p class="route__text">Po přejití pokračujte rovně. Povrch přechází v dlažební kostky.</p>
+            </li>
+            <li class="route__step route__step--end">
+              <span class="route__tag">Cíl</span>
+              <p class="route__text">Cíl je vpravo: vchod do budovy s&nbsp;knihovnou.</p>
+            </li>
+          </ol>
+        </div>
+      </div>
+      </div>
+    </section>
+
+    <!-- CO UMÍ -->
+    <section class="section section--tint" id="co-umi" aria-labelledby="co-umi-title">
+      <div class="container">
+        <div class="section__head reveal">
+          <p class="eyebrow">Co Naviterier umí</p>
+          <h2 id="co-umi-title">Popis, na který se dá spolehnout</h2>
+          <p class="lead">Místo „jděte na sever“ vám Naviterier řekne, co máte kolem sebe a kam přesně jít.</p>
+        </div>
+        <ul class="grid reveal-stagger">
+          <li class="card">
+            <svg class="card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M21 11.5a8.4 8.4 0 0 1-8.5 8.5 8.5 8.5 0 0 1-3.8-.9L3 21l1.9-5.7A8.5 8.5 0 1 1 21 11.5z"/></svg>
+            <h3>Popíše cestu lidsky</h3>
+            <p>Trasu vám vypráví přirozenými větami — tak, jak byste ji popsali člověku.</p>
+          </li>
+          <li class="card">
+            <svg class="card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m9 4-6 2v14l6-2 6 2 6-2V4l-6 2-6-2z"/><path d="M9 4v14M15 6v14"/></svg>
+            <h3>Popisuje okolí</h3>
+            <p>Budovy, zeleň, sklon i povrch chodníku a hluk dopravy — víte, čím procházíte.</p>
+          </li>
+          <li class="card">
+            <svg class="card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 2v20"/><path d="M5 6h11l3 2.5L16 11H5z"/></svg>
+            <h3>Pozná stranu ulice</h3>
+            <p>Naviterier ví, na které straně ulice jste, a podle toho vás vede.</p>
+          </li>
+          <li class="card">
+            <svg class="card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="8" y="2" width="8" height="15" rx="4"/><circle cx="12" cy="6.5" r="1.3" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.3" fill="currentColor" stroke="none"/><path d="M12 17v5"/></svg>
+            <h3>Rozpozná přechody</h3>
+            <p>Světelné i nesvětelné přechody, tramvajové přejezdy a směr provozu.</p>
+          </li>
+          <li class="card">
+            <svg class="card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M3 20h4v-4h4v-4h4V8h6"/></svg>
+            <h3>Vede krok za krokem</h3>
+            <p>Každý úsek si vyžádáte sami. Tempo určujete vy, ne aplikace.</p>
+          </li>
+          <li class="card">
+            <svg class="card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><path d="m9.2 11 2 2 3.6-3.6"/></svg>
+            <h3>Hlídá postup přes GPS</h3>
+            <p>Pozná, když se odchýlíte z trasy, a potvrdí vám, že jdete správně.</p>
+          </li>
+          <li class="card">
+            <svg class="card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1" fill="currentColor" stroke="none"/></svg>
+            <h3>Odhadne polohu</h3>
+            <p>Když ztratíte orientaci, určí polohu kombinací GPS a krátkého dialogu s vámi.</p>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- JAK TO FUNGUJE -->
+    <section class="section" id="jak-to-funguje" aria-labelledby="jak-title">
+      <div class="container">
+        <div class="section__head reveal">
+          <p class="eyebrow">Jak to funguje</p>
+          <h2 id="jak-title">Od zadání cíle až k cíli</h2>
+        </div>
+        <ol class="steps reveal-stagger">
+          <li>
+            <h3>Zadáte start a cíl</h3>
+            <p>Adresou, názvem místa (POI), nebo aktuální polohou z GPS.</p>
+          </li>
+          <li>
+            <h3>Naviterier sestaví trasu</h3>
+            <p>Buď jako celý seznam kroků na přípravu doma, nebo krok za krokem do terénu.</p>
+          </li>
+          <li>
+            <h3>U každého úseku slyšíte popis</h3>
+            <p>Podrobný popis okolí a jasný pokyn, kam pokračovat dál.</p>
+          </li>
+          <li>
+            <h3>Postupujete vlastním tempem</h3>
+            <p>Po dokončení úseku si sami vyžádáte další krok.</p>
+          </li>
+          <li>
+            <h3>Když zabloudíte, znovu se zorientujete</h3>
+            <p>Naviterier vás přes GPS navede zpět na trasu; podrobné popisy umožní i samostatné dohledání.</p>
+          </li>
+        </ol>
+        <div class="callout reveal">
+          <p>GPS slouží jen jako hrubá kontrola — v ulicích mezi domy klesá přesnost na desítky metrů. Hlavním senzorem polohy jste vy.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- POKRYTÍ -->
+    <section class="section section--tint" id="pokryti" aria-labelledby="pokryti-title">
+      <div class="container">
+        <div class="section__head reveal">
+          <p class="eyebrow">Pokrytí</p>
+          <h2 id="pokryti-title">Funguje v celé České republice</h2>
+          <p class="lead">Naviterier funguje po celé ČR ve dvou úrovních kvality.</p>
+        </div>
+        <div class="tiers reveal-stagger">
+          <div class="tier">
+            <p class="tier__rank">Prémiové pokrytí</p>
+            <h3>Města</h3>
+            <p>Metropolitní oblasti a širší centra měst. Nejvyšší kvalita navigace s úplnou topologií chodníků.</p>
+          </div>
+          <div class="tier">
+            <p class="tier__rank">Standardní pokrytí</p>
+            <h3>Venkov a menší obce</h3>
+            <p>Stejná data jako běžné navigace, ale zpracovaná způsobem vhodnějším pro nevidomé.</p>
+          </div>
+        </div>
+        <p class="prose" style="margin-top:1.5rem; color:var(--ink-soft)">Pokrytí postupně rozšiřujeme do dalších zemí střední Evropy.</p>
+      </div>
+    </section>
+
+    <!-- CENA -->
+    <section class="section" id="cena" aria-labelledby="cena-title">
+      <div class="container">
+        <div class="section__head reveal">
+          <p class="eyebrow">Cena a dostupnost</p>
+          <h2 id="cena-title">Celá navigace zdarma</h2>
+        </div>
+        <div class="price-grid reveal">
+          <div class="price-card">
+            <p class="price-card__amount">Zdarma</p>
+
+            <p class="price-card__note">Webová aplikace pro chytré telefony s iOS i Androidem. Nemusíte nic instalovat z obchodu — stačí otevřít v prohlížeči.</p>
+            <button class="btn btn--primary" disabled>Otevřít aplikaci <span class="badge-soon">Již brzy</span></button>
+          </div>
+          <div>
+            <h3>Klíčové vlastnosti aplikace</h3>
+            <ul class="checklist">
+              <li>Plánování trasy a navigace</li>
+              <li>Zadání startu i cíle adresou nebo místem (POI)</li>
+              <li>Start trasy s pomocí GPS</li>
+              <li>Objevování míst (POI) ve vašem okolí</li>
+              <li>Sledování postupu na trase</li>
+              <li>Historie posledně hledaných adres</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ČASTÉ DOTAZY -->
+    <section class="section section--tint" id="caste-dotazy" aria-labelledby="faq-title">
+      <div class="container">
+        <div class="section__head reveal">
+          <p class="eyebrow">Časté dotazy</p>
+          <h2 id="faq-title">Na co se ptáte nejčastěji</h2>
+        </div>
+        <div class="faq reveal-stagger">
+          <details class="faq__item">
+            <summary class="faq__q">Najde mě Naviterier jen podle GPS?
+              <svg class="faq__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+            </summary>
+            <div class="faq__a"><p>Ne. V zástavbě bývá přesnost GPS v řádu desítek metrů, takže sama nepozná, na kterém chodníku nebo přechodu jste. Hlavním senzorem polohy jste vy — a Naviterier vám k tomu dává dost podrobné popisy.</p></div>
+          </details>
+          <details class="faq__item">
+            <summary class="faq__q">Co když přejdu odbočku?
+              <svg class="faq__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+            </summary>
+            <div class="faq__a"><p>Naviterier vás dokáže znovu zorientovat a díky podrobným popisům okolí se zpravidla dostanete zpět sami.</p></div>
+          </details>
+          <details class="faq__item">
+            <summary class="faq__q">Kolik dat aplikace spotřebuje?
+              <svg class="faq__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+            </summary>
+            <div class="faq__a"><p>Velmi málo. Datový balíček 100 MB pokryje přes 10 000 běžných tras.</p></div>
+          </details>
+          <details class="faq__item">
+            <summary class="faq__q">Je k dispozici mapa?
+              <svg class="faq__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+            </summary>
+            <div class="faq__a"><p>Ano, mapu v aplikaci máte. Můžete ji ukázat známému nebo kolemjdoucímu a nechat si trasu potvrdit.</p></div>
+          </details>
+          <details class="faq__item">
+            <summary class="faq__q">Je to výzkumný projekt, nebo komerční produkt?
+              <svg class="faq__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+            </summary>
+            <div class="faq__a"><p>Komerční produkt. Vyvíjí a provozuje ho společnost Naviterier&nbsp;s.r.o.</p></div>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <!-- TÝM A VÝZKUM -->
+    <section class="section" id="tym" aria-labelledby="tym-title">
+      <div class="container">
+        <div class="section__head reveal">
+          <p class="eyebrow">Tým a výzkum</p>
+          <h2 id="tym-title">Stojíme na letech výzkumu</h2>
+        </div>
+        <div class="split reveal">
+          <div>
+            <h3>Tým</h3>
+            <ul class="people">
+              <li>Jan Balata</li>
+              <li>Zdeněk Míkovec</li>
+              <li>Kamil Darebný</li>
+              <li>Jakub Bokšanský</li>
+              <li>Christophe Beaujard</li>
+            </ul>
+          </div>
+          <div class="prose">
+            <h3>Výzkumné zázemí</h3>
+            <p>Funkce, navigační strategii i styl popisu stavíme na letech výzkumu interakce člověka s počítačem (HCI) a přístupnosti.</p>
+            <p class="quote">Propojujeme roky výzkumu se životy lidí — aby mohli být svobodní, samostatní a plně se zapojit do společenského života.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- FOOTER / KONTAKT -->
+  <footer class="site-footer" id="kontakt">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <p class="eyebrow">Kontakt</p>
+          <h2>Napište nám</h2>
+          <p class="prose" style="color:var(--ink-soft)">Máte dotaz nebo chcete Naviterier vyzkoušet? Ozvěte se — rádi vám poradíme.</p>
+          <p class="footer-email"><a href="mailto:info@naviterier.cz">info@naviterier.cz</a></p>
+        </div>
+        <div>
+          <h3>Naviterier s.r.o.</h3>
+          <ul class="contact-list">
+            <li>Donovalská 1659/32, Praha 4</li>
+            <li><strong>IČ:</strong> 05648939</li>
+            <li><strong>DIČ:</strong> CZ05648939</li>
+            <li>Městský soud v Praze, oddíl C, vložka 268306</li>
+            <li>Neplátce DPH</li>
+          </ul>
+        </div>
+      </div>
+      <p class="legal">© 2026 Naviterier s.r.o. — Navigace pro nevidomé a slabozraké chodce.</p>
+    </div>
+  </footer>
+
+<script>
+  (function () {
+    if (!('IntersectionObserver' in window)) {
+      document.querySelectorAll('.reveal, .reveal-stagger').forEach(function (el) {
+        el.classList.add('is-visible');
+      });
+      return;
+    }
+    var observer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) {
+          e.target.classList.add('is-visible');
+          observer.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.12 });
+    document.querySelectorAll('.reveal, .reveal-stagger').forEach(function (el) {
+      observer.observe(el);
+    });
+  })();
+</script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+<script>
+  (function () {
+    var dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    var tiles = dark
+      ? 'https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png'
+      : 'https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png';
+    var map = L.map('hero-map', {
+      center: [50.0878, 14.4394],
+      zoom: 13,
+      dragging: false, touchZoom: false, scrollWheelZoom: false,
+      zoomControl: false, keyboard: false, doubleClickZoom: false,
+      attributionControl: false
+    });
+    L.tileLayer(tiles, {
+      attribution: '&copy; <a href="https://carto.com/">CARTO</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    }).addTo(map);
+  })();
+</script>
+</body>
+</html>
