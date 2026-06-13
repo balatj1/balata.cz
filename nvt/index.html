@@ -98,9 +98,10 @@
     font-size: 1.125rem;
     line-height: 1.65;
     -webkit-font-smoothing: antialiased;
+    overflow-x: clip;
   }
   h1, h2, h3 { line-height: 1.15; letter-spacing: -0.01em; margin: 0 0 .5em; }
-  h1 { font-size: clamp(2.2rem, 6vw, 3.4rem); }
+  h1 { font-size: clamp(1.8rem, 8vw, 3.4rem); }
   h2 { font-size: clamp(1.7rem, 4vw, 2.3rem); }
   h3 { font-size: 1.3rem; }
   p { margin: 0 0 1rem; }
@@ -136,6 +137,7 @@
   .section__head { max-width: var(--measure); margin-bottom: var(--space-8); }
   .eyebrow {
     display: inline-flex; align-items: center; gap: var(--space-3);
+    flex-wrap: wrap; max-width: 100%;
     font-size: var(--text-sm); font-weight: 700;
     letter-spacing: .14em; text-transform: uppercase;
     color: var(--brand-ink); margin-bottom: var(--space-3);
@@ -162,7 +164,7 @@
   .btn--ghost { background: transparent; color: var(--brand-ink); border-color: currentColor; }
   .btn--ghost:hover { background: var(--bg-tint); color: var(--brand-ink); }
   .btn:active { transform: translateY(1px); }
-  .btn:disabled { opacity: .5; cursor: not-allowed; }
+  .btn:disabled, .btn[aria-disabled="true"] { opacity: .5; cursor: not-allowed; }
   .badge-soon {
     display: inline-block; font-size: .65rem; font-weight: 700; letter-spacing: .06em;
     background: rgba(255,255,255,.25); color: inherit;
@@ -357,6 +359,19 @@
   .footer-email { font-size: var(--text-lg); font-weight: 700; }
   .legal { margin-top: var(--space-8); padding-top: var(--space-6); border-top: 1px solid var(--border); color: var(--ink-soft); font-size: var(--text-sm); }
 
+  /* FAQ border needs higher contrast against --bg-tint (1.4.11) */
+  .section--tint .faq__item { border-color: #9099c0; }
+
+  /* ---------- Mobile hero ---------- */
+  @media (max-width: 47.99rem) {
+    .hero { padding-block: var(--space-8); }
+    .hero__meta span { white-space: normal; }
+    .hero__meta .sep { display: none; }
+    .hero__meta { display: flex; flex-wrap: wrap; gap: var(--space-1) var(--space-3); }
+    .route { padding: var(--space-4); }
+    .route__step { padding-bottom: var(--space-4); }
+  }
+
   /* ---------- Responsive ---------- */
   @media (min-width: 48rem) {
     .header-cta { display: inline-flex; }
@@ -428,8 +443,8 @@
   }
 
   /* ---------- Button primary hover lift ---------- */
-  .btn--primary:not(:disabled):hover { transform: translateY(-1px); }
-  .btn--primary:not(:disabled):active { transform: translateY(1px); }
+  .btn--primary:not(:disabled):not([aria-disabled="true"]):hover { transform: translateY(-1px); }
+  .btn--primary:not(:disabled):not([aria-disabled="true"]):active { transform: translateY(1px); }
 
   /* ---------- FAQ smooth expand ---------- */
   .faq__a {
@@ -496,7 +511,7 @@
 
       <nav class="primary-nav-wrap" aria-label="Hlavní">
         <details class="primary-nav">
-          <summary class="primary-nav__toggle">
+          <summary class="primary-nav__toggle" aria-label="Navigační menu">
             Menu
             <svg class="primary-nav__chevron" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m6 9 6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </summary>
@@ -511,7 +526,7 @@
         </details>
       </nav>
 
-      <button class="btn btn--primary header-cta" disabled>Otevřít aplikaci <span class="badge-soon">Již brzy</span></button>
+      <button class="btn btn--primary header-cta" aria-disabled="true">Otevřít aplikaci <span class="badge-soon">Již brzy</span></button>
     </div>
   </header>
 
@@ -523,11 +538,11 @@
       <div class="container">
       <div class="hero__grid">
         <div>
-          <p class="eyebrow">Navigace pro nevidomé chodce <span class="badge-free" aria-label="Zdarma">Zdarma</span></p>
+          <p class="eyebrow">Navigace pro nevidomé chodce <span class="badge-free">Zdarma</span></p>
           <h1 class="hero__title" id="hero-title">Naviguje vás slovy, ne mapou.</h1>
           <p class="hero__lead">Naviterier je navigace pro nevidomé a slabozraké chodce. Cestu vám popíše tak, jak by ji popsal člověk — krok za krokem, s okolím, přechody i povrchem chodníku.</p>
           <div class="hero__actions">
-            <button class="btn btn--primary" disabled>Otevřít aplikaci <span class="badge-soon">Již brzy</span></button>
+            <button class="btn btn--primary" aria-disabled="true">Otevřít aplikaci <span class="badge-soon">Již brzy</span></button>
             <a class="btn btn--ghost" href="#jak-to-funguje">Jak to funguje</a>
           </div>
           <p class="hero__meta">
@@ -535,7 +550,7 @@
           </p>
         </div>
 
-        <div class="route" role="group" aria-label="Ukázka, jak Naviterier popisuje trasu">
+        <div class="route" role="region" aria-label="Ukázka, jak Naviterier popisuje trasu">
           <p class="route__label">
             <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 22s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="11" r="2" fill="currentColor"/></svg>
             Ukázka trasy
@@ -605,11 +620,6 @@
             <svg class="card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><path d="m9.2 11 2 2 3.6-3.6"/></svg>
             <h3>Hlídá postup přes GPS</h3>
             <p>Pozná, když se odchýlíte z trasy, a potvrdí vám, že jdete správně.</p>
-          </li>
-          <li class="card">
-            <svg class="card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1" fill="currentColor" stroke="none"/></svg>
-            <h3>Odhadne polohu</h3>
-            <p>Když ztratíte orientaci, určí polohu kombinací GPS a krátkého dialogu s vámi.</p>
           </li>
         </ul>
       </div>
@@ -686,7 +696,7 @@
             <p class="price-card__amount">Zdarma</p>
 
             <p class="price-card__note">Webová aplikace pro chytré telefony s iOS i Androidem. Nemusíte nic instalovat z obchodu — stačí otevřít v prohlížeči.</p>
-            <button class="btn btn--primary" disabled>Otevřít aplikaci <span class="badge-soon">Již brzy</span></button>
+            <button class="btn btn--primary" aria-disabled="true">Otevřít aplikaci <span class="badge-soon">Již brzy</span></button>
           </div>
           <div>
             <h3>Klíčové vlastnosti aplikace</h3>
@@ -785,7 +795,7 @@
           <p class="footer-email"><a href="mailto:info@naviterier.cz">info@naviterier.cz</a></p>
         </div>
         <div>
-          <h3>Naviterier s.r.o.</h3>
+          <h2>Naviterier s.r.o.</h2>
           <ul class="contact-list">
             <li>Donovalská 1659/32, Praha 4</li>
             <li><strong>IČ:</strong> 05648939</li>
@@ -799,6 +809,14 @@
     </div>
   </footer>
 
+<script>
+  document.querySelectorAll('[aria-disabled="true"]').forEach(function (el) {
+    el.addEventListener('click', function (e) { e.preventDefault(); });
+    el.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); }
+    });
+  });
+</script>
 <script>
   (function () {
     if (!('IntersectionObserver' in window)) {
