@@ -289,7 +289,7 @@
     content: counter(step);
     grid-column: 1; grid-row: 1 / 3;
     width: 2.5rem; height: 2.5rem; border-radius: 50%;
-    background: var(--accent); color: var(--ink);  /* 14:1 (AAA) */
+    background: var(--accent); color: #1a1a1a;      /* always dark on yellow, same as .badge-free */
     display: grid; place-items: center;
     font-weight: 700; font-size: 1.1rem;
     align-self: start; margin-top: .1rem;          /* optical alignment with h3 */
@@ -855,10 +855,9 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 <script>
   (function () {
-    var dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    var tiles = dark
-      ? 'https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png'
-      : 'https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png';
+    var mq = window.matchMedia('(prefers-color-scheme: dark)');
+    var DARK  = 'https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png';
+    var LIGHT = 'https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png';
     var map = L.map('hero-map', {
       center: [50.0878, 14.4394],
       zoom: 13,
@@ -866,9 +865,12 @@
       zoomControl: false, keyboard: false, doubleClickZoom: false,
       attributionControl: false
     });
-    L.tileLayer(tiles, {
+    var tileLayer = L.tileLayer(mq.matches ? DARK : LIGHT, {
       attribution: '&copy; <a href="https://carto.com/">CARTO</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
     }).addTo(map);
+    mq.addEventListener('change', function (e) {
+      tileLayer.setUrl(e.matches ? DARK : LIGHT);
+    });
   })();
 </script>
 </body>
